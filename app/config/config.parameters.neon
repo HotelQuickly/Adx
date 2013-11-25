@@ -27,3 +27,9 @@ parameters:
 		priority_default : 10000
 		job_timeout : 600
 		worker_checker_url: ""
+
+	emailSettings:
+		adx:
+			domain: "imap.gmail.com"
+			username: "myo.kyaw.htun@hotelquickly.com"
+			password: "MyoHotel"
