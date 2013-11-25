@@ -13,3 +13,4 @@ services:
 		class: ChangelogModule\DbChangelog
 		arguments: [@database, @database::table(changelog), %appDir%]
 	errorMessageService: HQ\Api\ErrorMessageService
+	mailService: HQ\Mail\MailService(%emailSettings.adx.domain%,%emailSettings.adx.username%,%emailSettings.adx.password%)
