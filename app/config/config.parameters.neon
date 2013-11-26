@@ -31,6 +31,6 @@ parameters:
 	emailSettings:
 		adx:
 			domain: "imap.gmail.com"
-			username: "myo.kyaw.htun@hotelquickly.com"
-			password: "MyoHotel"
+			username: "adx.clicks@hotelquickly.com"
+			password: "AD8HQuikly"
 			sender: "noreply@ad-x.co.uk"
