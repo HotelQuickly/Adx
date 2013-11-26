@@ -56,15 +56,20 @@ class MailService extends \Nette\Object {
 		$this->emailsCount = imap_num_msg($this->mailConn); // get the number of mails
 		$this->emails = array();
 
+		set_time_limit(120);
+
 		for($i=1; $i<= $this->emailsCount; $i++){
 			$headers = imap_headerinfo($this->mailConn, $i);
 			
 			if($headers->Unseen == 'U'){
-				$this->emails[] = array(
-					'index' => $i, 
-					'header' => imap_header($this->mailConn, $i),
-					'structure' => imap_fetchstructure($this->mailConn, $i)
-				);
+				$subject = $headers->subject;
+				if(preg_match("/AD-X Report AD-X_Clicks/i",$subject)){
+					$this->emails[] = array(
+						'index' => $i, 
+						'header' => imap_header($this->mailConn, $i),
+						'structure' => imap_fetchstructure($this->mailConn, $i)
+					);
+				}
 			}
 		}
 		
@@ -73,83 +78,80 @@ class MailService extends \Nette\Object {
 		return $this->emails;
 	}
 	// check attachments
-	public function checkAttachments($emails)
+	public function checkAttachments($email)
 	{
 		$attachCount = 0;
 		$attachments = array();
 
-		foreach($emails as $email){
+ 		if(isset($email['structure']->parts) && count($email['structure']->parts)) {
+ 			
+ 			// loop through all the attachments
+ 			for($i=0; $i < count($email['structure']->parts);$i++){
 
-	 		if(isset($email['structure']->parts) && count($email['structure']->parts)) {
-	 			
-	 			// loop through all the attachments
-	 			for($i=0; $i < count($email['structure']->parts);$i++){
+ 				if($email['structure']->parts[$i]->ifdisposition){
+ 					
+ 					if ($email['structure']->parts[$i]->ifparameters){
 
-	 				if($email['structure']->parts[$i]->ifdisposition){
-	 					
-	 					if ($email['structure']->parts[$i]->ifparameters){
+ 						foreach ($email['structure']->parts[$i]->parameters as $object){
+ 							
+ 							if (strtolower($object->attribute) == 'name'){
+ 								
+ 								$filename = pathinfo(strtolower($object->value));
+ 								
+ 								if($filename['extension'] == 'csv'){
+ 									
+ 									$attachments[$attachCount] = array(
+ 										'name' => $object->value,
+ 										'filename' => $object->value,
+ 										'attachment' => ''
+ 									);
+ 								}
+ 							}
+ 						}
+ 						
+ 					}
 
-	 						foreach ($email['structure']->parts[$i]->parameters as $object){
-	 							
-	 							if (strtolower($object->attribute) == 'name'){
-	 								
-	 								$filename = pathinfo(strtolower($object->value));
-	 								
-	 								if($filename['extension'] == 'csv'){
-	 									
-	 									$attachments[$attachCount] = array(
-	 										'name' => $object->value,
-	 										'filename' => $object->value,
-	 										'attachment' => ''
-	 									);
-	 								}
-	 							}
-	 						}
-	 						
-	 					}
+ 					if ($email['structure']->parts[$i]->ifdparameters){
 
-	 					if ($email['structure']->parts[$i]->ifdparameters){
+ 						foreach ($email['structure']->parts[$i]->dparameters as $object){
 
-	 						foreach ($email['structure']->parts[$i]->dparameters as $object){
+ 							if (strtolower($object->attribute) == 'filename') {
 
-	 							if (strtolower($object->attribute) == 'filename') {
+ 								$filename = pathinfo(strtolower($object->value));
+ 								
+ 								if($filename['extension'] == 'csv'){
 
-	 								$filename = pathinfo(strtolower($object->value));
-	 								
-	 								if($filename['extension'] == 'csv'){
+ 									$attachments[$attachCount] = array(
+ 										'name' => $object->value,
+ 										'filename' => $object->value,
+ 										'attachment' => ''
+ 									);
+ 								}
+ 							}
+ 						}
+ 						
+ 					}
+ 					
+ 					$attachments[$attachCount]['attachment'] = imap_fetchbody($this->mailConn, $email['index'], $i+1);
+ 					
+ 					// check encoding is base 64
 
-	 									$attachments[$attachCount] = array(
-	 										'name' => $object->value,
-	 										'filename' => $object->value,
-	 										'attachment' => ''
-	 									);
-	 								}
-	 							}
-	 						}
-	 						
-	 					}
-	 					
-	 					$attachments[$attachCount]['attachment'] = imap_fetchbody($this->mailConn, $email['index'], $i+1);
-	 					
-	 					// check encoding is base 64
+ 					if ($email['structure']->parts[$i]->encoding == 3) {
 
-	 					if ($email['structure']->parts[$i]->encoding == 3) {
+ 						$attachments[$attachCount]['attachment'] = base64_decode($attachments[$attachCount]['attachment']);
+ 				
+ 					} elseif ($email['structure']->parts[$i]->encoding == 4) {
+ 						
+ 						$attachments[$attachCount]['attachment'] = quoted_printable_decode($attachments[$attachCount]['attachment']);
+ 				
+ 					}
 
-	 						$attachments[$attachCount]['attachment'] = base64_decode($attachments[$attachCount]['attachment']);
-	 				
-	 					} elseif ($email['structure']->parts[$i]->encoding == 4) {
-	 						
-	 						$attachments[$attachCount]['attachment'] = quoted_printable_decode($attachments[$attachCount]['attachment']);
-	 				
-	 					}
-
-	 					$attachCount = $attachCount + 1;
-            		}
-	 			}
+ 					$attachCount = $attachCount + 1;
+        		}
+ 			}
 
 
-	 		}
-	 	}
+ 		}
 	 	return $attachments;
 	}
 
@@ -168,7 +170,7 @@ class MailService extends \Nette\Object {
 	*
 	*/
 
-	public function readCSV($csvData)
+	public function importCSV($csvData)
 	{
 		
 		$i=0;
@@ -192,7 +194,7 @@ class MailService extends \Nette\Object {
     			);
     			
     			// time to insert the data
-    			$this->dailyStatsEntity->insert($adxData);
+    			$this->dailyStatsEntity->insertOrUpdate($adxData);
     		}
 
     		$i = $i+1;
