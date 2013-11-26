@@ -37,6 +37,7 @@ class RouterFactory
 
 			// Cron Router
 			$cronRouter = new RouteList('Cron');
+			$cronRouter[] = new Route('cron/mail/hi', 'Mail:hi');
 			$cronRouter[] = new Route('cron/<presenter>/<action>[/<id>]', 'Homepage:default');
 			$router[] = $cronRouter;
 

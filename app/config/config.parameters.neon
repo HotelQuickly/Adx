@@ -33,3 +33,4 @@ parameters:
 			domain: "imap.gmail.com"
 			username: "myo.kyaw.htun@hotelquickly.com"
 			password: "MyoHotel"
+			sender: "noreply@ad-x.co.uk"
