@@ -21,8 +21,12 @@ class MailService extends \Nette\Object {
 
 	/** @var \HQ\Model\Entity\DailyStatsEntity **/
 	private $dailyStatsEntity;
+	/** @var \HQ\Model\Entity\LogDailyStatsEntity **/
+	private $logDailyStatsEntity;
 
-	public function __construct($domain, $username, $password, \HQ\Model\Entity\DailyStatsEntity $dailyStatsEntity)
+	public function __construct($domain, $username, $password, 
+								\HQ\Model\Entity\DailyStatsEntity $dailyStatsEntity, 
+								\HQ\Model\Entity\LogDailyStatsEntity $logDailyStatsEntity )
 	{
 		
 		$this->imapDomain = "{" . $domain . ":993/imap/ssl}INBOX";
@@ -30,6 +34,7 @@ class MailService extends \Nette\Object {
 		$this->imapPassword = $password;
 
 		$this->dailyStatsEntity = $dailyStatsEntity;
+		$this->logDailyStatsEntity = $logDailyStatsEntity;
 	}
 	// connect imap server 
 	public function connect()
@@ -56,18 +61,20 @@ class MailService extends \Nette\Object {
 		$this->emailsCount = imap_num_msg($this->mailConn); // get the number of mails
 		$this->emails = array();
 
-		set_time_limit(120);
+		set_time_limit(180);
 
 		for($i=1; $i<= $this->emailsCount; $i++){
 			$headers = imap_headerinfo($this->mailConn, $i);
-			
+			//var_dump($headers);
 			if($headers->Unseen == 'U'){
 				$subject = $headers->subject;
 				if(preg_match("/AD-X Report AD-X_Clicks/i",$subject)){
 					$this->emails[] = array(
 						'index' => $i, 
 						'header' => imap_header($this->mailConn, $i),
-						'structure' => imap_fetchstructure($this->mailConn, $i)
+						'subject' => $subject,
+						'structure' => imap_fetchstructure($this->mailConn, $i),
+						'uid' => $headers->message_id
 					);
 				}
 			}
@@ -170,7 +177,7 @@ class MailService extends \Nette\Object {
 	*
 	*/
 
-	public function importCSV($csvData)
+	public function importCSV($csvData, $csvFilename, $emailCode, $emailSubject)
 	{
 		
 		$i=0;
@@ -199,7 +206,15 @@ class MailService extends \Nette\Object {
 
     		$i = $i+1;
     	}
-    	
+		// log email log stats
+		$emailLog = array(
+				'records_count'=>$i,
+				'email_filename'=>$csvFilename,
+				'email_subject' => $emailSubject,
+				'email_code'=>$emailCode,
+				'email_message'=> $i . " records has been added from " . $csvFilename
+			);
+		$this->logDailyStatsEntity->insertOrUpdate($emailLog);
     	return $i;
 	}
 }
