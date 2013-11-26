@@ -187,7 +187,8 @@ class MailService extends \Nette\Object {
     				"app" => $linearray[2],
     				"campaign_code" => $linearray[3],
     				"clicks_cnt" => $linearray[4],
-    				"downloads_cnt" => $linearray[5]
+    				"downloads_cnt" => $linearray[5],
+    				"ins_process_id" => 'classes.mail.mailservice:195'
     			);
     			
     			// time to insert the data
