@@ -10,3 +10,4 @@ services:
 	- HQ\Model\Entity\UserEntity
 	- HQ\Model\Entity\ChangelogEntity
 	- HQ\Model\Entity\DailyStatsEntity
+	- HQ\Model\Entity\LogDailyStatsEntity
