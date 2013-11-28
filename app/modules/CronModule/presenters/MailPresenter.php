@@ -21,22 +21,21 @@ class MailPresenter extends BasePresenter {
 		$mailConn = $this->mailService->connect();
 		$emails = $this->mailService->fetchInbox();
 
-		if(count($emails)){
+		if(count($emails)) {
 			foreach ($emails as $email) {
 				
 				$attachments = $this->mailService->checkAttachments($email);
-				
-				if(count($attachments)){
 
+				if(count($attachments)) {
 					foreach ($attachments as $attachment) {
 						$totalRecord = $this->mailService->importCSV($attachment['attachment'],$attachment['filename'],$email['uid'],$email['subject']);
 						echo $totalRecord . " records has been added from " . $attachment['filename'] . "<br />";
 					}
-				}else{
+				}else {
 					echo "No attachment to import";
 				}
 			}
-		}else{
+		}else {
 			echo "No new emails with attachment to do processing!";
 		}
 	}

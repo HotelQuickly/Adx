@@ -87,6 +87,25 @@ class MailService extends \Nette\Object {
 
 		return $this->emails;
 	}
+	// get attachments
+	public function getAttachments($object)
+	{
+		// this function will retrieve the attachment object
+		
+		if (strtolower($object->attribute) == 'name' || strtolower($object->attribute) == 'filename') {
+			$filename = pathinfo(strtolower($object->value));
+			if($filename['extension'] == 'csv') {
+				$attachment = array(
+					'name' => $object->value,
+					'filename' => $object->value,
+					'attachment' => ''
+				);
+			}
+		}
+		
+		return $attachment;
+
+	}
 	// check attachments
 	public function checkAttachments($email)
 	{
@@ -98,38 +117,17 @@ class MailService extends \Nette\Object {
  			// loop through all the attachments
  			for($i=0; $i < count($email['structure']->parts);$i++) {
  				if($email['structure']->parts[$i]->ifdisposition) {
+ 					$parameters = array();
+
  					if ($email['structure']->parts[$i]->ifparameters) {
- 						foreach ($email['structure']->parts[$i]->parameters as $object) {
- 							if (strtolower($object->attribute) == 'name') {
- 								$filename = pathinfo(strtolower($object->value));
- 								if($filename['extension'] == 'csv') {
- 									
- 									$attachments[$attachCount] = array(
- 										'name' => $object->value,
- 										'filename' => $object->value,
- 										'attachment' => ''
- 									);
- 								}
- 							}
- 						}
- 						
+ 						$parameters = $email['structure']->parts[$i]->parameters;
+ 					} else if ($email['structure']->parts[$i]->ifdparameters) {
+ 						$parameters = $email['structure']->parts[$i]->dparameters;
  					}
 
- 					if ($email['structure']->parts[$i]->ifdparameters) {
- 						foreach ($email['structure']->parts[$i]->dparameters as $object) {
- 							if (strtolower($object->attribute) == 'filename') {
- 								$filename = pathinfo(strtolower($object->value));
- 								if($filename['extension'] == 'csv') {
- 									$attachments[$attachCount] = array(
- 										'name' => $object->value,
- 										'filename' => $object->value,
- 										'attachment' => ''
- 									);
- 								}
- 							}
- 						}
- 						
- 					}
+					foreach ($parameters as $object) {
+						$attachments[$attachCount] = $this->getAttachments($object);
+					}
  					
  					$attachments[$attachCount]['attachment'] = imap_fetchbody($this->mailConn, $email['index'], $i+1);
  					// check encoding is base 64
@@ -141,9 +139,8 @@ class MailService extends \Nette\Object {
  					$attachCount = $attachCount + 1;
         		}
  			}
-
-
  		}
+ 		
 	 	return $attachments;
 	}
 
@@ -165,41 +162,37 @@ class MailService extends \Nette\Object {
 	public function importCSV($csvData, $csvFilename, $emailCode, $emailSubject)
 	{
 		
-		$i=0;
+		//$i=0;
 		$data = str_getcsv($csvData,"\n","'","");
+		unset($data[0]); // skip first row with header
 
 		foreach($data as &$Row) {
     		
     		$linearray = str_getcsv($Row,',',''); //parse the items in rows 
     		$linemysql = implode("','",$linearray);
-    		
-    		if($i!=0) {  // skip the first header row
     			
-    			$adxData = array(
-    				"date" => new \Nette\DateTime($linearray[0]), //date("Y-m-d",strtotime($linearray[0])), //
-    				"network_code" => $linearray[1],
-    				"app" => $linearray[2],
-    				"campaign_code" => $linearray[3],
-    				"clicks_cnt" => $linearray[4],
-    				"downloads_cnt" => $linearray[5],
-    				"ins_process_id" => 'classes.mail.mailservice:195'
-    			);
-    			
-    			// time to insert the data
-    			$this->dailyStatsEntity->insertOrUpdate($adxData);
-    		}
-
-    		$i = $i+1;
+			$adxData = array(
+				"date" => new \Nette\DateTime($linearray[0]), //date("Y-m-d",strtotime($linearray[0])), //
+				"network_code" => $linearray[1],
+				"app" => $linearray[2],
+				"campaign_code" => $linearray[3],
+				"clicks_cnt" => $linearray[4],
+				"downloads_cnt" => $linearray[5],
+				"ins_process_id" => 'classes.mail.mailservice:184'
+			);
+			
+			// time to insert the data
+			$this->dailyStatsEntity->insertOrUpdate($adxData);
     	}
 		// log email log stats
 		$emailLog = array(
-				'records_count'=>$i,
-				'email_filename'=>$csvFilename,
-				'email_subject' => $emailSubject,
-				'email_code'=>$emailCode,
-				'email_message'=> $i . " records has been added from " . $csvFilename
-			);
+			'records_count'=>count($data),
+			'email_filename'=>$csvFilename,
+			'email_subject' => $emailSubject,
+			'email_code'=>$emailCode,
+			'email_message'=> count($data) . " records has been added from " . $csvFilename
+		);
 		$this->logDailyStatsEntity->insertOrUpdate($emailLog);
-    	return $i;
+    	return count($data);
 	}
 }
