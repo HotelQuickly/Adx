@@ -64,7 +64,7 @@ class MailService extends \Nette\Object {
 		$this->emailsCount = imap_num_msg($this->mailConn); // get the number of mails
 		$this->emails = array();
 
-		set_time_limit(180); // 3 minutes
+		set_time_limit(0); // unlimited execution time
 
 		for($i=1; $i<= $this->emailsCount; $i++){
 			$headers = imap_headerinfo($this->mailConn, $i);
