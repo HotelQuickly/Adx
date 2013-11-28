@@ -24,9 +24,12 @@ class MailService extends \Nette\Object {
 	/** @var \HQ\Model\Entity\LogDailyStatsEntity **/
 	private $logDailyStatsEntity;
 
-	public function __construct($domain, $username, $password, 
-								\HQ\Model\Entity\DailyStatsEntity $dailyStatsEntity, 
-								\HQ\Model\Entity\LogDailyStatsEntity $logDailyStatsEntity )
+	public function __construct(
+		$domain, 
+		$username, 
+		$password, 
+		\HQ\Model\Entity\DailyStatsEntity $dailyStatsEntity, 
+		\HQ\Model\Entity\LogDailyStatsEntity $logDailyStatsEntity )
 	{
 		
 		$this->imapDomain = "{" . $domain . ":993/imap/ssl}INBOX";
@@ -93,19 +96,13 @@ class MailService extends \Nette\Object {
  		if(isset($email['structure']->parts) && count($email['structure']->parts)) {
  			
  			// loop through all the attachments
- 			for($i=0; $i < count($email['structure']->parts);$i++){
-
- 				if($email['structure']->parts[$i]->ifdisposition){
- 					
- 					if ($email['structure']->parts[$i]->ifparameters){
-
- 						foreach ($email['structure']->parts[$i]->parameters as $object){
- 							
- 							if (strtolower($object->attribute) == 'name'){
- 								
+ 			for($i=0; $i < count($email['structure']->parts);$i++) {
+ 				if($email['structure']->parts[$i]->ifdisposition) {
+ 					if ($email['structure']->parts[$i]->ifparameters) {
+ 						foreach ($email['structure']->parts[$i]->parameters as $object) {
+ 							if (strtolower($object->attribute) == 'name') {
  								$filename = pathinfo(strtolower($object->value));
- 								
- 								if($filename['extension'] == 'csv'){
+ 								if($filename['extension'] == 'csv') {
  									
  									$attachments[$attachCount] = array(
  										'name' => $object->value,
@@ -118,16 +115,11 @@ class MailService extends \Nette\Object {
  						
  					}
 
- 					if ($email['structure']->parts[$i]->ifdparameters){
-
- 						foreach ($email['structure']->parts[$i]->dparameters as $object){
-
+ 					if ($email['structure']->parts[$i]->ifdparameters) {
+ 						foreach ($email['structure']->parts[$i]->dparameters as $object) {
  							if (strtolower($object->attribute) == 'filename') {
-
  								$filename = pathinfo(strtolower($object->value));
- 								
- 								if($filename['extension'] == 'csv'){
-
+ 								if($filename['extension'] == 'csv') {
  									$attachments[$attachCount] = array(
  										'name' => $object->value,
  										'filename' => $object->value,
@@ -140,19 +132,12 @@ class MailService extends \Nette\Object {
  					}
  					
  					$attachments[$attachCount]['attachment'] = imap_fetchbody($this->mailConn, $email['index'], $i+1);
- 					
  					// check encoding is base 64
-
  					if ($email['structure']->parts[$i]->encoding == 3) {
-
  						$attachments[$attachCount]['attachment'] = base64_decode($attachments[$attachCount]['attachment']);
- 				
  					} elseif ($email['structure']->parts[$i]->encoding == 4) {
- 						
  						$attachments[$attachCount]['attachment'] = quoted_printable_decode($attachments[$attachCount]['attachment']);
- 				
  					}
-
  					$attachCount = $attachCount + 1;
         		}
  			}
