@@ -30,7 +30,8 @@ if (function_exists('isDebugMode') AND isDebugMode($debugArray) == true) {
 	$configurator->setProductionMode(false);
 }
 
-//$configurator->setProductionMode(true);
+Debugger::enable(Debugger::DEVELOPMENT);
+$configurator->setProductionMode(false);
 
 // Enable RobotLoader - this will load all classes automatically
 $configurator->setTempDirectory(__DIR__ . '/../temp');

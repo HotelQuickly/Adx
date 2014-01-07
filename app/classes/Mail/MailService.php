@@ -43,7 +43,7 @@ class MailService extends \Nette\Object {
 	public function connect()
 	{
 
-		$this->mailConn = imap_open($this->imapDomain, $this->imapUsername, $this->imapPassword) or die ("Can't connect to mail server");
+		$this->mailConn = \imap_open($this->imapDomain, $this->imapUsername, $this->imapPassword) or die ("Can't connect to mail server");
 
 		if($this->mailConn) {
 			// return the whole mail box
