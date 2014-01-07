@@ -22,11 +22,11 @@ class CampaignPresenter extends BasePresenter {
 		$dailyStats = $this->dailyStatsModel->getStatsForCampaign($networkCode, $campaignCode);
 		
 		$ret = array(
-			'clicks_cnt' => $dailyStats['clicks_cnt'],
-			'downloads_cnt' => $dailyStats['downloads_cnt'],
+			'clicks_cnt' => ($dailyStats ? $dailyStats['clicks_cnt'] : null),
+			'downloads_cnt' => ($dailyStats ? $dailyStats['downloads_cnt'] : null),
 			'network_code' => $networkCode,
 			'campaign_code' => $campaignCode,
-			'last_update_date' => $dailyStats['last_update_date']->format('Y-m-d H:i:s')
+			'last_update_date' => ($dailyStats ? $dailyStats['last_update_date']->format('Y-m-d H:i:s') : null),
 		);
 		
 		$this->prepareAndSendValidResponse($ret);
