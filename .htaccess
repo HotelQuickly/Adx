@@ -1,0 +1,26 @@
+php_value upload_max_filesize 64M
+
+RewriteEngine on
+Options +FollowSymLinks
+
+# For browser cache
+<IfModule mod_expires.c>
+	<FilesMatch ".(ico|pdf|flv|jpg|jpeg|png|gif|js|css|swf)$">
+		ExpiresActive on
+		ExpiresDefault "access plus 7 days"
+	</FilesMatch>
+</IfModule>
+
+# For mod_status
+RewriteRule ^server-status_oiuespdofilk3w089assadklj		- [L]
+
+# NETTE
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)(\.pdf|js|ico|gif|jpg|jpeg|png|bmp|css|rar|zip|eot|svg|otf|ttf|woff|swf|tar\.gz)$ www_root/$1$2 [NC,L]
+RewriteRule !^(.*)(\.pdf|js|ico|gif|jpg|jpeg|png|bmp|css|rar|zip|eot|svg|otf|ttf|woff|swf|tar\.gz)$ www_root/index.php [NC,L]
+
+# if a directory or a file exists, use it directly
+# otherwise forward it to index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule .* /www_root/index.php [L]
