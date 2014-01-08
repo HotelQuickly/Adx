@@ -18,7 +18,7 @@ class CampaignPresenter extends BasePresenter {
 	public function actionDefault() {
 		$networkCode = $this->getHttpRequest()->getQuery('network_code');
 		$campaignCode = $this->getHttpRequest()->getQuery('campaign_code');
-		$adgroupCode = $this->getHttpRequest()->getQuery('campaign_code');
+		$adgroupCode = $this->getHttpRequest()->getQuery('adgroup_code');
 		
 		$dailyStats = $this->dailyStatsModel->getStatsForCampaign($networkCode, $campaignCode, $adgroupCode);
 		
