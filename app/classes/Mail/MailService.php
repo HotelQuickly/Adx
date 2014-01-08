@@ -175,7 +175,8 @@ class MailService extends \Nette\Object {
 				"date" => new \Nette\DateTime($linearray[0]), //date("Y-m-d",strtotime($linearray[0])), //
 				"network_code" => $linearray[1],
 				"app" => $linearray[2],
-				"campaign_code" => $linearray[3],
+				"campaign_code" => null,
+				"adgroup_code" => $linearray[3],
 				"clicks_cnt" => $linearray[4],
 				"downloads_cnt" => $linearray[5],
 				"ins_process_id" => 'classes.mail.mailservice:184'
