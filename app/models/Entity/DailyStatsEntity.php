@@ -9,15 +9,15 @@ class DailyStatsEntity extends BaseEntity {
 			->select('SUM(clicks_cnt) AS clicks_cnt, SUM(downloads_cnt) AS downloads_cnt, MAX(date) AS last_update_date');
 
 		if (!empty($networkCode)) {
-			$row->where('network_code', $networkCode);
+			$row->where('network_code IS NULL OR network_code = ?', $networkCode);
 		}
 
 		if (!empty($campaignCode)) {
-			$row->where('campaign_code', $campaignCode);
+			$row->where('campaign_code IS NULL OR campaign_code = ?', $campaignCode);
 		}
 
 		if (!empty($adgroupCode)) {
-			$row->where('adgroup_code', $adgroupCode);
+			$row->where('adgroup_code IS NULL OR adgroup_code = ?', $adgroupCode);
 		}
 			
 		return $row->fetch();
