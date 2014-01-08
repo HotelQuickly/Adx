@@ -5,7 +5,7 @@ namespace HQ\Model\Entity;
 class DailyStatsEntity extends BaseEntity {
 
 	public function getStatsForCampaign($networkCode, $campaignCode, $adgroupCode) {
-		$row $this->getTable()
+		$row = $this->getTable()
 			->select('SUM(clicks_cnt) AS clicks_cnt, SUM(downloads_cnt) AS downloads_cnt, MAX(date) AS last_update_date');
 
 		if (!empty($networkCode)) {
