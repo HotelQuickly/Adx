@@ -28,7 +28,7 @@ class CampaignPresenter extends BasePresenter {
 			'network_code' => $networkCode,
 			'campaign_code' => $campaignCode,
 			'adgroup_code' => $adgroupCode,
-			'last_update_date' => ($dailyStats ? $dailyStats['last_update_date']->format('Y-m-d H:i:s') : null),
+			'last_update_date' => (($dailyStats AND $dailyStats['last_update_date']) ? $dailyStats['last_update_date']->format('Y-m-d H:i:s') : null),
 		);
 		
 		$this->prepareAndSendValidResponse($ret);
