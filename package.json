@@ -1,0 +1,39 @@
+{
+  "name": "Adx",
+  "description": "WebServer for Adx callbacks",
+  "homepage": "https://github.com/HotelQuickly/Adx/",
+  "author": "Michal Juhas, HotelQuickly",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/HotelQuickly/Adx/"
+  },
+  "main": "index",
+  "engines": {
+    "node": "0.10.x"
+  },
+  "dependencies": {
+    "hapi": "2.x.x",
+    "mysql": "2.0.0-alpha8",
+    "request": "2.33.x"
+  },
+  "devDependencies": {
+    "hapi": "2.x.x",
+    "mysql": "2.0.0-alpha8"
+  },
+  "bin": {
+    "hapi": "./bin/hapi"
+  },
+  "scripts": {
+    "test": "make test-cov"
+  },
+  "licenses": [
+    {
+      "type": "BSD",
+      "url": "http://github.com/spumko/hapi/raw/master/LICENSE"
+    }
+  ],
+  "bugs": {
+    "url": "https://github.com/HotelQuickly/Adx/issues"
+  }
+}
