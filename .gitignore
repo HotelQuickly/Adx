@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 www_root/webtemp/*
 www_root/webtemp
 
@@ -40,3 +41,7 @@ tests/config.tests.neon
 tests/changelog.log
 
 tests/changelog.log
+=======
+config.js
+node_modules/*
+>>>>>>> beaea04cbca367b2af595e5604c12a28ae334320
