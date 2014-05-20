@@ -15,7 +15,7 @@ parameters:
 			prefix: HQ Live
 			allName: HQ Live All
 
-	adminEmail: it@hotelquickly.com
+	adminEmail: it-support@hotelquickly.com
 	emailSender: michal.juhas@hotelquickly.com
 	beanstalk:
 		host : 127.0.0.1
