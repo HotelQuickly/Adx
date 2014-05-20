@@ -56,7 +56,7 @@ class RouterFactory
 
 			// API Router
 			$apiRouter = new RouteList('Api');
-			$apiRouter[] = new Route('api/<apiVersion>/campaigns/statistics', 'Campaign:statistics');
+			$apiRouter[] = new Route('api/<apiVersion>/campaign/statistics', 'Campaign:statistics');
 			$apiRouter[] = new Route('api/<apiVersion>/<presenter>[/<action>]', 'Homepage:default');
 			$router[] = $apiRouter;
 

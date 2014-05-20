@@ -15,7 +15,7 @@ class CampaignPresenter extends BasePresenter {
 	/** @autowire @var \HQ\Model\Entity\DailyStatsEntity */
 	protected $dailyStatsModel;
 
-	public function actionDefault() {
+	public function actionStatistics() {
 		$networkCode = $this->getHttpRequest()->getQuery('network_code');
 		$campaignCode = $this->getHttpRequest()->getQuery('campaign_code');
 		$adgroupCode = $this->getHttpRequest()->getQuery('adgroup_code');
